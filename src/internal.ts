@@ -1,4 +1,3 @@
-import { type Dict } from "koishi";
 import type { OneBot } from "./bot";
 import type { CQCode } from "./bot/cqcode";
 import type {
@@ -18,10 +17,12 @@ import type {
 } from "./types";
 import type { Device } from "./types/device";
 import type { HonorType, SafetyLevel } from "./types/enum";
-import type { GroupMessageEvent, MessageEvent } from "./types/event/message";
+import type { GroupMessageEvent, MessageEvent, PrivateMessageEvent } from "./types/event/message";
 import type { GroupInfo, GroupMemberInfo } from "./types/group";
-import { SenderError } from "./types/sender";
 import type { UserInfo } from "./types/user";
+import { type Dict } from "koishi";
+
+import { SenderError } from "./types/sender";
 
 export class Internal {
   _request?: (action: string, params: Dict) => Promise<any>;
@@ -135,10 +136,27 @@ export class Internal {
     return await this._get("ocr_image", { image });
   }
 
-  async getGroupMsgHistory(group_id: number, message_seq?: number): Promise<{ messages: GroupMessageEvent[] }> {
+  async getGroupMsgHistory(
+    group_id: number,
+    message_seq?: number,
+    count?: number
+  ): Promise<{ messages: GroupMessageEvent[] }> {
     return await this._get("get_group_msg_history", {
       group_id,
-      message_seq
+      message_seq,
+      count
+    });
+  }
+
+  async getPrivateMsgHistory(
+    user_id: number,
+    message_seq?: number,
+    count?: number
+  ): Promise<{ messages: PrivateMessageEvent[] }> {
+    return await this._get("get_friend_msg_history", {
+      user_id,
+      message_seq,
+      count
     });
   }
 

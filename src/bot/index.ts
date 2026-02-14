@@ -1,10 +1,12 @@
 import type { Context } from "koishi";
 import { Bot, Schema, type Session, Universal } from "koishi";
+
 import { HttpServer } from "../http";
 import { Internal } from "../internal";
 import { type MessageEvent } from "../types/event/message";
 import { adaptChannel, adaptGuild, convertUser, decodeGuildMember, decodeMessage } from "../utils";
 import { WsClient, WsServer } from "../ws";
+
 import { OneBotMessageEncoder, PRIVATE_PFX } from "./message";
 export { CQCode } from "./cqcode";
 
@@ -98,15 +100,15 @@ export class OneBot<C extends Context = Context> extends Bot<C> {
     if (direction !== "before") throw new Error("Unsupported direction.");
     // include `before` message
     let list: MessageEvent[];
-    if (next) {
-      const msg = await this.internal.getMsg(Number(next));
-      if (msg?.message_seq) {
-        list = (await this.internal.getGroupMsgHistory(Number(channelId), msg.message_id)).messages;
-      }
+    if (channelId.startsWith(PRIVATE_PFX)) {
+      const userId = channelId.slice(PRIVATE_PFX.length);
+      const data = await this.internal.getPrivateMsgHistory(Number(userId), next ? Number(next) : undefined, 20); // 统一不同实现必须 20 条记录，避免分页逻辑过于复杂
+      list = data.messages;
     } else {
-      list = (await this.internal.getGroupMsgHistory(Number(channelId))).messages;
+      const groupId = channelId;
+      const data = await this.internal.getGroupMsgHistory(Number(groupId), next ? Number(next) : undefined, 20);
+      list = data.messages;
     }
-
     // 从旧到新
     return {
       data: await Promise.all(list.map((item) => decodeMessage(this, item)))
