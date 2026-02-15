@@ -1,6 +1,7 @@
-import type { Session } from "koishi";
-import { OneBot } from "./bot";
 import type { Internal } from "./internal";
+import type { Session } from "koishi";
+
+import { OneBot } from "./bot";
 
 export { OneBot };
 
@@ -13,9 +14,8 @@ export default OneBot;
 declare module "koishi" {
   interface Session {
     onebot?: Internal & {
-      targetId?: string;
-      duration?: number;
-    }; // TODO: onebot event value
+      [key: string]: unknown;
+    };
   }
 }
 
