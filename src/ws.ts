@@ -1,7 +1,8 @@
+import type { OneBot } from "./bot";
 import type { WebSocketLayer } from "@koishijs/plugin-server";
 import type { Context, Logger } from "koishi";
 import { Adapter, HTTP, Schema, Time, Universal, type Dict } from "koishi";
-import type { OneBot } from "./bot";
+
 import { dispatchSession, TimeoutError, type ApiResponse } from "./utils";
 
 export interface SharedConfig<T = "ws" | "ws-reverse"> {

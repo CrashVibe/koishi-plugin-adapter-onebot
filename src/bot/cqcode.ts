@@ -272,7 +272,7 @@ export namespace CQCode {
   const ESCAPE_MAP = { "&": "&amp;", "[": "&#91;", "]": "&#93;" };
   const UNESCAPE_MAP = Object.fromEntries(Object.entries(ESCAPE_MAP).map(([k, v]) => [v, k]));
 
-  export function escape(source: any, inline = false) {
+  export function escape(source: string, inline = false) {
     let result = String(source).replace(/[&[\]]/g, (m) => ESCAPE_MAP[m]);
     if (inline) {
       result = result.replace(/,/g, "&#44;");

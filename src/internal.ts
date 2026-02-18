@@ -25,10 +25,10 @@ import { type Dict } from "koishi";
 import { SenderError } from "./types/sender";
 
 export class Internal {
-  _request?: (action: string, params: Dict) => Promise<any>;
+  _request?: (action: string, params: Dict) => Promise<Dict>;
   constructor(public readonly bot: OneBot) {}
 
-  private async _get(action: string, params = {}): Promise<any> {
+  private async _get(action: string, params = {}): Promise<any> { // TODO: 这里的 any 应该是一个泛型
     this.bot.logger.debug("[request] %s %o", action, params);
     if (!this._request) {
       throw new Error("适配器未连接");

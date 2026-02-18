@@ -27,6 +27,6 @@ export interface BaseEvent<T extends EventType> {
 }
 
 // 类型守卫
-export function isBaseEvent(event: any): event is BaseEvent<EventType> {
+export function isBaseEvent(event: unknown): event is BaseEvent<EventType> {
   return event && typeof event === "object" && "post_type" in event && "time" in event && "self_id" in event;
 }
