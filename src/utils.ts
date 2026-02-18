@@ -1,14 +1,15 @@
+import type { OneBot } from "./bot";
+import type { BaseEvent } from "./types/event/base";
+import type { GroupInfo, GroupMemberInfo } from "./types/group";
+import type { UserInfo } from "./types/user";
 import { h, omit, Universal } from "koishi";
 import * as qface from "qface";
-import type { OneBot } from "./bot";
+
 import { CQCode } from "./bot/cqcode";
 import { EventType, GroupMemberRole } from "./types/enum";
-import type { BaseEvent } from "./types/event/base";
 import { isGroupMessageEvent, isMessageEvent, type MessageEvent } from "./types/event/message";
 import { isGroupPokeNotice, isNoticeEvent, NoticeType } from "./types/event/notice";
 import { isFriendRequest, isGroupRequest, isRequestEvent } from "./types/event/request";
-import type { GroupInfo, GroupMemberInfo } from "./types/group";
-import type { UserInfo } from "./types/user";
 
 export * from "./types";
 
@@ -55,7 +56,7 @@ export async function decodeMessage(
   const chain = CQCode.parse(event.message);
 
   // 映射
-  message.elements = h.transform(chain, {
+  message.elements = await h.transformAsync(chain, {
     text(attrs: CQCode.Text["data"]) {
       return h.text(attrs.text);
     },
@@ -84,6 +85,7 @@ export async function decodeMessage(
       return h.image(attrs.url || attrs.file, {
         title: attrs.name || undefined,
         ...omit(
+          attrs,
           [attrs.name ? "name" : undefined, attrs.url ? "url" : undefined, attrs.file ? "file" : undefined].filter(
             (k): k is string => !!k
           )
@@ -92,33 +94,37 @@ export async function decodeMessage(
     },
     record(attrs: CQCode.Record["data"]) {
       return h.audio(attrs.url || attrs.file, {
-        ...omit([attrs.url ? "url" : undefined, attrs.file ? "file" : undefined].filter((k): k is string => !!k))
+        ...omit(
+          attrs,
+          [attrs.url ? "url" : undefined, attrs.file ? "file" : undefined].filter((k): k is string => !!k)
+        )
       });
     },
     video(attrs: CQCode.Video["data"]) {
       return h.video(attrs.url || attrs.file, {
-        ...omit([attrs.url ? "url" : undefined, attrs.file ? "file" : undefined].filter((k): k is string => !!k))
+        ...omit(
+          attrs,
+          [attrs.url ? "url" : undefined, attrs.file ? "file" : undefined].filter((k): k is string => !!k)
+        )
       });
     },
     file(attrs: CQCode.File["data"]) {
       return h.file(attrs.url || attrs.file, {
-        ...omit([attrs.url ? "url" : undefined, attrs.file ? "file" : undefined].filter((k): k is string => !!k))
+        ...omit(
+          attrs,
+          [attrs.url ? "url" : undefined, attrs.file ? "file" : undefined].filter((k): k is string => !!k)
+        )
       });
     },
-    reply(attrs: CQCode.Reply["data"]) {
-      return h("reply", { id: attrs.id });
-    }
-  });
-
-  if (message.elements[0] && message.elements[0].type === "reply") {
-    const reply = message.elements.shift();
-    if (reply) {
-      message.quote = await bot.getMessage(channelId, reply.attrs.id).catch((error) => {
+    async reply(attrs: CQCode.Reply["data"]) {
+      message.quote = await bot.getMessage(channelId, attrs.id).catch((error) => {
         bot.logger.warn(error);
         return undefined;
       });
+      return h.quote(attrs.id);
     }
-  }
+  });
+
   message.content = message.elements.join("");
   payload.timestamp = event.time * 1000;
   message.id = event.message_id.toString();
