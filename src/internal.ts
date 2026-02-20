@@ -28,7 +28,8 @@ export class Internal {
   _request?: (action: string, params: Dict) => Promise<Dict>;
   constructor(public readonly bot: OneBot) {}
 
-  private async _get(action: string, params = {}): Promise<any> { // TODO: 这里的 any 应该是一个泛型
+  // TODO: 这里的 any 应该是一个泛型
+  private async _get(action: string, params = {}): Promise<any> {
     this.bot.logger.debug("[request] %s %o", action, params);
     if (!this._request) {
       throw new Error("适配器未连接");
@@ -523,5 +524,9 @@ export class Internal {
       folder_id,
       new_folder_name
     });
+  }
+
+  async sendMsgReaction(message_id: number, emoji_id: number, set: boolean): Promise<void> {
+    await this._get("set_msg_emoji_like", { message_id, emoji_id, set });
   }
 }

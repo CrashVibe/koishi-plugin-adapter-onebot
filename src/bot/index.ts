@@ -164,6 +164,20 @@ export class OneBot<C extends Context = Context> extends Bot<C> {
     }
     return super.checkPermission(name, session);
   }
+
+  async createReaction(channelId: string, messageId: string, emoji: string): Promise<void> {
+    if (isNaN(Number(emoji))) {
+      throw new Error("Unsupported emoji format. Only numeric emoji IDs are supported.");
+    }
+    await this.internal.sendMsgReaction(Number(messageId), Number(emoji), true);
+  }
+
+  async deleteReaction(channelId: string, messageId: string, emoji: string): Promise<void> {
+    if (isNaN(Number(emoji))) {
+      throw new Error("Unsupported emoji format. Only numeric emoji IDs are supported.");
+    }
+    await this.internal.sendMsgReaction(Number(messageId), Number(emoji), false);
+  }
 }
 
 export namespace OneBot {
