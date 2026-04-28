@@ -36,17 +36,17 @@
     "qface": "^1.4.1"
   },
   "devDependencies": {
-    "@koishijs/plugin-server": "^3.2.7",
-    "@types/node": "^25.0.10",
+    "@koishijs/plugin-server": "^3.2.9",
+    "@types/node": "^25.6.0",
     "atsc": "^2.1.0",
-    "esbuild": "^0.27.2",
+    "esbuild": "^0.27.7",
     "esbuild-register": "^3.6.0",
-    "koishi": "^4.18.10",
+    "koishi": "^4.18.11",
     "typescript": "^5.9.3",
     "yml-register": "^1.2.5"
   },
   "peerDependencies": {
-    "koishi": "^4.18.6"
+    "koishi": "^4.18.11"
   },
   "koishi": {
     "description": {
