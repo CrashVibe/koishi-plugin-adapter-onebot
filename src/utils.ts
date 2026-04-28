@@ -5,7 +5,7 @@ import type { UserInfo } from "./types/user";
 import { h, omit, Universal } from "koishi";
 import * as qface from "qface";
 
-import { CQCode } from "./bot/cqcode";
+import { CQCode } from "./bot";
 import { EventType, GroupMemberRole } from "./types/enum";
 import { isGroupMessageEvent, isMessageEvent, type MessageEvent } from "./types/event/message";
 import { isGroupPokeNotice, isNoticeEvent, NoticeType } from "./types/event/notice";
@@ -42,7 +42,7 @@ export const decodeGuildMember = (user: GroupMemberInfo, isBot: boolean = false)
   nick: user.card || user.nickname,
   title: user.title,
   avatar: `https://q.qlogo.cn/headimg_dl?dst_uin=${user.user_id}&spec=640`,
-  roles: [user.role]
+  roles: [{id: user.role}]
 });
 
 export async function decodeMessage(
@@ -135,7 +135,6 @@ export async function decodeMessage(
     name: event.message_type === "group" ? (event.group_name as string) || undefined : event.sender.nickname
   };
   payload.user = decodeUser(event);
-
   if (isGroupMessageEvent(event)) {
     payload.guild = {
       id: event.group_id.toString(),
@@ -147,7 +146,7 @@ export async function decodeMessage(
       name: event.sender.nickname,
       nick: event.sender.card,
       avatar: `https://q.qlogo.cn/headimg_dl?dst_uin=${event.user_id}&spec=640`,
-      roles: event.sender.role ? [event.sender.role] : []
+      roles: event.sender.role ? [{id:event.sender.role}] : []
     };
   }
   return message;
